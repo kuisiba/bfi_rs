@@ -11,21 +11,8 @@ fn read_file(f: File) -> Vec<char> {
     for byte in f.bytes() {
         if let Ok(c) = byte {
             // + -  . , > < [ ]
-            if c == 43 {
-                ret.push(c as char);
-            } else if c == 45 {
-                ret.push(c as char);
-            } else if c == 46 {
-                ret.push(c as char);
-            } else if c == 44 {
-                ret.push(c as char);
-            } else if c == 62 {
-                ret.push(c as char);
-            } else if c == 60 {
-                ret.push(c as char);
-            } else if c == 91 {
-                ret.push(c as char);
-            } else if c == 93 {
+            if c == 43 || c == 45 || c == 46 || c == 44 || c == 62 || c == 60 || c == 91 || c == 93
+            {
                 ret.push(c as char);
             }
         }
@@ -39,11 +26,11 @@ fn read_file(f: File) -> Vec<char> {
 fn parse_args(args: env::Args) -> Result<String, String> {
     let args: Vec<String> = args.collect();
     if args.len() == 1 {
-        return Err("not enough arguments".to_string());
+        Err("not enough arguments".to_string())
     } else if args.len() == 2 {
-        return Ok(args[1].clone());
+        Ok(args[1].clone())
     } else {
-        return Err("invalid arguments".to_string());
+        Err("invalid arguments".to_string())
     }
 }
 fn getchar() -> char {
@@ -75,13 +62,13 @@ fn run(codes: Vec<char>) {
             ptr -= 1;
         } else if codes[pc] == '+' {
             memory[ptr] += 1;
-            if !(memory[ptr] <= 127) {
+            if 127 < memory[ptr] {
                 eprintln!("memory[ptr]: {}", memory[ptr]);
                 process::exit(1);
             }
         } else if codes[pc] == '-' {
             memory[ptr] -= 1;
-            if !(memory[ptr] <= 127) {
+            if 127 < memory[ptr] {
                 eprintln!("memory[ptr]: {}", memory[ptr]);
                 process::exit(1);
             }
@@ -115,7 +102,7 @@ fn run(codes: Vec<char>) {
         }
         pc += 1;
     }
-    print!("\n");
+    println!();
     io::stdout().flush().unwrap();
 }
 fn main() {
