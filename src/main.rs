@@ -93,7 +93,7 @@ fn run(codes: Vec<char>) -> Result<(), Box<Error>> {
                     pc += 1;
                     if codes_len <= pc {
                         //対応する括弧が見つからなかった
-                        return Err(format!("] not found").into());
+                        return Err("] not found".into());
                     }
                     if codes[pc] == '[' {
                         bracket += 1;
