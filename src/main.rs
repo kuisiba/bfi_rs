@@ -7,17 +7,15 @@ use std::process;
 
 const MEM_SIZE: usize = 32768;
 
-fn getchar() -> char {
+fn getchar() -> Result<char, Box<Error>> {
     let mut s = String::new();
-    io::stdin().read_line(&mut s).unwrap_or_else(|err| {
-        eprintln!(", read_line err: {}", err);
-        process::exit(1);
-    });
-    let c: char = s.trim().parse::<char>().unwrap_or_else(|err| {
-        eprintln!("parse char err: {}", err);
-        process::exit(1);
-    });
-    c
+    io::stdin().read_line(&mut s)?;
+    let c: char = s.trim().parse::<char>()?;
+    if c.is_ascii() {
+        Ok(c)
+    } else {
+        Err("it is not ascii".into())
+    }
 }
 fn parse_args(args: env::Args) -> Result<String, String> {
     let args: Vec<String> = args.collect();
@@ -73,8 +71,15 @@ fn run(codes: Vec<char>) -> Result<(), Box<Error>> {
         } else if codes[pc] == '.' {
             print!("{}", memory[ptr] as char);
         } else if codes[pc] == ',' {
-            let c = getchar() as u8;
-            memory[ptr] = c;
+            match getchar() {
+                Ok(c) => {
+                    memory[ptr] = c as u8;
+                }
+                Err(e) => {
+                    eprintln!("getchar() failed: {}", e);
+                    process::exit(1);
+                }
+            }
         } else if codes[pc] == '[' {
             stack.push_back(pc);
             //メモリの値が0なら対応するカッコまでジャンプ
