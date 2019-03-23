@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 use std::env;
 use std::error::Error;
-use std::fs::File;
-use std::io::{self, Read, Write};
+use std::fs;
+use std::io::{self, Write};
 use std::process;
 
 const MEM_SIZE: usize = 32768;
@@ -27,15 +27,19 @@ fn parse_args(args: env::Args) -> Result<String, String> {
         Err("invalid arguments".to_string())
     }
 }
-fn read_file(f: File) -> Vec<char> {
+fn read_file(s: String) -> Vec<char> {
     let mut ret = Vec::new();
-    for byte in f.bytes() {
-        if let Ok(c) = byte {
-            // + -  . , > < [ ]
-            if c == 43 || c == 45 || c == 46 || c == 44 || c == 62 || c == 60 || c == 91 || c == 93
-            {
-                ret.push(c as char);
-            }
+    for c in s.chars() {
+        if c == '+'
+            || c == '-'
+            || c == '.'
+            || c == ','
+            || c == '>'
+            || c == '<'
+            || c == '['
+            || c == ']'
+        {
+            ret.push(c);
         }
     }
     if MEM_SIZE < ret.len() {
@@ -114,11 +118,11 @@ fn main() {
         process::exit(1);
     });
 
-    let f = File::open(filename).unwrap_or_else(|err| {
+    let s = fs::read_to_string(filename).unwrap_or_else(|err| {
         eprintln!("can't open the file: {}", err);
         process::exit(1);
     });
-    let codes: Vec<char> = read_file(f);
+    let codes: Vec<char> = read_file(s);
     if let Err(e) = run(codes) {
         eprintln!("run error: {}", e);
         process::exit(1);
